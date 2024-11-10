@@ -84,53 +84,47 @@ const challanAPI = {
     });
   },
 
-  // Create new data
   createChallan: (req, res) => {
-    const {
-      customerId,
-      productId,
-      engineerId,
-      challanPrice,
-      challanDate,
-      challanRemark,
-    } = req.body;
+    console.log("Received request body:", req.body);
 
-    if (!customerId) {
+    // Ensure request body is an array
+    if (!Array.isArray(req.body)) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields",
+        message: "Request body must be an array of challan objects",
+        receivedData: req.body,
       });
     }
 
+    // Prepare batch insert query
     const query = `
-        INSERT INTO challanmaster
-        (customerId, productId, engineerId, challanPrice, challanDate, challanRemark) 
-        VALUES (?, ?, ?, ?, ?, ?)
-      `;
+      INSERT INTO challanmaster
+      (customerId, productId, engineerId, challanPrice, challanDate, challanRemark) 
+      VALUES ?
+    `;
 
-    const values = [
-      customerId,
-      productId,
-      engineerId,
-      challanPrice,
-      challanDate,
-      challanRemark,
-    ];
+    // Prepare values for batch insert
+    const values = req.body.map((challan) => [
+      challan.customerId,
+      challan.productId,
+      challan.engineerId || null,
+      challan.challanPrice || null,
+      challan.challanDate || new Date().toISOString().split("T")[0],
+      challan.challanRemark || null,
+    ]);
 
-    db.query(query, values, (err, result) => {
+    console.log("Executing batch insert with values:", values);
+
+    // Execute batch insert
+    db.query(query, [values], (err, result) => {
       if (err) {
-        console.error("Error creating challan:", err);
+        console.error("Error creating challans:", err);
         return res.status(500).json({
           success: false,
-          message: "Error creating challan",
+          message: "Error creating challans",
+          error: err.message,
         });
       }
-
-      res.status(201).json({
-        success: true,
-        message: "challan created successfully",
-        data: { id: result.insertId },
-      });
     });
   },
 
@@ -139,23 +133,45 @@ const challanAPI = {
     const challanId = req.params.id;
     const updateData = req.body;
 
+    console.log("Received update data:", updateData); // Debugging log
+
     // Remove any fields that shouldn't be updated directly
     delete updateData.id;
     delete updateData.created_at;
     delete updateData.deleted_at;
 
-    // Create SET clause dynamically
-    const updateFields = Object.keys(updateData)
+    // Filter out non-primitive values
+    const filteredUpdateData = {};
+    for (const [key, value] of Object.entries(updateData)) {
+      if (typeof value !== "object" || value === null) {
+        filteredUpdateData[key] = value;
+      } else {
+        console.warn(
+          `Skipping field ${key} because it is not a primitive value.`
+        );
+      }
+    }
+
+    // Check if there are fields to update
+    const updateFields = Object.keys(filteredUpdateData)
       .map((key) => `${key} = ?`)
       .join(", ");
 
-    const query = `
-          UPDATE challanmaster
-          SET ${updateFields}, updated_at = CURRENT_TIMESTAMP
-          WHERE challanId = ? AND deleted_at IS NULL
-        `;
+    if (!updateFields) {
+      console.error("No valid fields to update.");
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields to update",
+      });
+    }
 
-    const values = [...Object.values(updateData), challanId];
+    const query = `
+      UPDATE challanmaster
+      SET ${updateFields}, updated_at = CURRENT_TIMESTAMP
+      WHERE challanId = ? AND deleted_at IS NULL
+    `;
+
+    const values = [...Object.values(filteredUpdateData), challanId];
 
     db.query(query, values, (err, result) => {
       if (err) {

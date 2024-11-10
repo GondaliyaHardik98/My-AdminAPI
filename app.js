@@ -23,4 +23,7 @@ app.use("/api", productRouters);
 const challanRouter = require("./routes/challanRouter");
 app.use("/api", challanRouter);
 
+const salaryRouter = require("./routes/salaryRouter");
+app.use("/api", salaryRouter);
+
 module.exports = app;
