@@ -5,7 +5,7 @@ const { productAPI } = require("../controllers/productAPI");
 // Routes
 router.get("/product", productAPI.getVendorCombo);
 router.get("/productAll", productAPI.getAllProductData);
-router.post("/Product", productAPI.createProduct);
+router.post("/product", productAPI.createProduct);
 router.put("/product/:id", productAPI.updateProduct);
 router.delete("/product/:id", productAPI.deleteProduct);
 

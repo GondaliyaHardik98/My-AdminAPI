@@ -66,7 +66,7 @@ const challanAPI = {
 
   //Get all data
   getAllChallan: (req, res) => {
-    const query = "SELECT * FROM challanmaster WHERE deleted_at IS NULL";
+    const query = "SELECT * FROM challan_view";
 
     db.query(query, (err, results) => {
       if (err) {
@@ -94,7 +94,7 @@ const challanAPI = {
       challanDate,
       challanRemark,
     } = req.body;
-    console.log(customerId, "customerId");
+
     if (!customerId) {
       return res.status(400).json({
         success: false,
