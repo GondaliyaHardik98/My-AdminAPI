@@ -3,10 +3,10 @@ const router = express.Router();
 const { sellAPI } = require("../controllers/sellAPI");
 
 // Routes
-// router.get("/product", productAPI.getVendorCombo);
-// router.get("/productAll", productAPI.getAllProductData);
-// router.post("/product", productAPI.createProduct);
-// router.put("/product/:id", productAPI.updateProduct);
-// router.delete("/product/:id", productAPI.deleteProduct);
+router.get("/sell", sellAPI.getAllSellData);
+router.get("/amcdata", sellAPI.getAMCData);
+router.post("/sell", sellAPI.createSell);
+router.put("/sell/:id", sellAPI.updateSell);
+router.delete("/sell/:id", sellAPI.deleteSell);
 
 module.exports = router;
