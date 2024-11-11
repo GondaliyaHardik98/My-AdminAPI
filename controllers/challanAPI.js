@@ -84,17 +84,49 @@ const challanAPI = {
     });
   },
 
+  //Get data by ID
+  getChallanById: (req, res) => {
+    const customerId = req.params.id;
+    const query =
+      "SELECT * FROM challanmaster WHERE customerId = ? AND deleted_at IS NULL";
+
+    db.query(query, [customerId], (err, results) => {
+      if (err) {
+        console.error("Error fetching challan:", err);
+        return res.status(500).json({
+          success: false,
+          message: "Error fetching challan",
+        });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Employee not found",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: results[0],
+      });
+    });
+  },
+
   createChallan: (req, res) => {
     console.log("Received request body:", req.body);
 
-    // Ensure request body is an array
+    // Ensure the outer structure is an array
     if (!Array.isArray(req.body)) {
       return res.status(400).json({
         success: false,
-        message: "Request body must be an array of challan objects",
+        message: "Request body must be an array of challan arrays",
         receivedData: req.body,
       });
     }
+
+    // Flatten the input array of arrays
+    const challanData = req.body.flat();
 
     // Prepare batch insert query
     const query = `
@@ -104,7 +136,7 @@ const challanAPI = {
     `;
 
     // Prepare values for batch insert
-    const values = req.body.map((challan) => [
+    const values = challanData.map((challan) => [
       challan.customerId,
       challan.productId,
       challan.engineerId || null,
@@ -125,6 +157,12 @@ const challanAPI = {
           error: err.message,
         });
       }
+
+      res.status(201).json({
+        success: true,
+        message: "Challans created successfully",
+        data: result,
+      });
     });
   },
 
