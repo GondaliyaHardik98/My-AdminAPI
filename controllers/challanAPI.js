@@ -102,13 +102,14 @@ const challanAPI = {
       if (results.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Employee not found",
+          message: "Challan not found",
         });
       }
 
+      // Ensure the response is always an array
       res.status(200).json({
         success: true,
-        data: results[0],
+        data: Array.isArray(results) ? results : [results],
       });
     });
   },
@@ -168,69 +169,130 @@ const challanAPI = {
 
   //Update data
   updateChallan: (req, res) => {
-    const challanId = req.params.id;
-    const updateData = req.body;
+    const customerId = req.params.id;
+    const challanData = req.body;
 
-    console.log("Received update data:", updateData); // Debugging log
-
-    // Remove any fields that shouldn't be updated directly
-    delete updateData.id;
-    delete updateData.created_at;
-    delete updateData.deleted_at;
-
-    // Filter out non-primitive values
-    const filteredUpdateData = {};
-    for (const [key, value] of Object.entries(updateData)) {
-      if (typeof value !== "object" || value === null) {
-        filteredUpdateData[key] = value;
-      } else {
-        console.warn(
-          `Skipping field ${key} because it is not a primitive value.`
-        );
-      }
-    }
-
-    // Check if there are fields to update
-    const updateFields = Object.keys(filteredUpdateData)
-      .map((key) => `${key} = ?`)
-      .join(", ");
-
-    if (!updateFields) {
-      console.error("No valid fields to update.");
+    if (!Array.isArray(challanData) || challanData.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "No valid fields to update",
+        message:
+          "Invalid request format. Expecting an array of challan entries",
       });
     }
 
-    const query = `
-      UPDATE challanmaster
-      SET ${updateFields}, updated_at = CURRENT_TIMESTAMP
-      WHERE challanId = ? AND deleted_at IS NULL
-    `;
-
-    const values = [...Object.values(filteredUpdateData), challanId];
-
-    db.query(query, values, (err, result) => {
+    // Start a transaction
+    db.beginTransaction(async (err) => {
       if (err) {
-        console.error("Error updating challan:", err);
         return res.status(500).json({
           success: false,
-          message: "Error updating challan",
+          message: "Error starting transaction",
+          error: err.message,
         });
       }
 
-      if (result.affectedRows === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "Challan not found",
+      try {
+        // 1. Soft delete existing records that are not in the update list
+        const challanIds = challanData
+          .filter((item) => item.challanId)
+          .map((item) => item.challanId);
+
+        let deleteQuery;
+        let deleteParams;
+
+        if (challanIds.length > 0) {
+          // If we have challanIds, exclude them from deletion
+          deleteQuery = `
+            UPDATE challanmaster 
+            SET deleted_at = CURRENT_TIMESTAMP 
+            WHERE customerId = ? 
+            AND deleted_at IS NULL 
+            AND challanId NOT IN (${challanIds.map(() => "?").join(",")})
+          `;
+          deleteParams = [customerId, ...challanIds];
+        } else {
+          // If no challanIds, soft delete all records for this customer
+          deleteQuery = `
+            UPDATE challanmaster 
+            SET deleted_at = CURRENT_TIMESTAMP 
+            WHERE customerId = ? 
+            AND deleted_at IS NULL
+          `;
+          deleteParams = [customerId];
+        }
+
+        await new Promise((resolve, reject) => {
+          db.query(deleteQuery, deleteParams, (err) =>
+            err ? reject(err) : resolve()
+          );
+        });
+
+        // 2. Update existing records and insert new ones
+        for (const item of challanData) {
+          const query = item.challanId
+            ? `
+              UPDATE challanmaster 
+              SET 
+                productId = ?,
+                engineerId = ?,
+                challanPrice = ?,
+                challanDate = ?,
+                challanRemark = ?,
+                updated_at = CURRENT_TIMESTAMP,
+                deleted_at = NULL
+              WHERE challanId = ? AND customerId = ?
+            `
+            : `
+              INSERT INTO challanmaster 
+              (customerId, productId, engineerId, challanPrice, challanDate, challanRemark)
+              VALUES (?, ?, ?, ?, ?, ?)
+            `;
+
+          const values = item.challanId
+            ? [
+                item.productId,
+                item.engineerId,
+                item.challanPrice,
+                item.challanDate || new Date().toISOString().split("T")[0],
+                item.challanRemark,
+                item.challanId,
+                customerId,
+              ]
+            : [
+                customerId,
+                item.productId,
+                item.engineerId,
+                item.challanPrice,
+                item.challanDate || new Date().toISOString().split("T")[0],
+                item.challanRemark,
+              ];
+
+          await new Promise((resolve, reject) => {
+            db.query(query, values, (err) => (err ? reject(err) : resolve()));
+          });
+        }
+
+        // Commit transaction
+        db.commit((err) => {
+          if (err) {
+            throw err;
+          }
+
+          res.status(200).json({
+            success: true,
+            message: "Challans updated successfully",
+          });
+        });
+      } catch (error) {
+        // Rollback on error
+        db.rollback(() => {
+          console.error("Error in update transaction:", error);
+          res.status(500).json({
+            success: false,
+            message: "Error updating challans",
+            error: error.message,
+          });
         });
       }
-
-      res.status(200).json({
-        success: true,
-        message: "Challan updated successfully",
-      });
     });
   },
 
@@ -240,7 +302,7 @@ const challanAPI = {
     const query = `
           UPDATE challanmaster
           SET deleted_at = CURRENT_TIMESTAMP
-          WHERE customerId = ? AND deleted_at IS NULL
+          WHERE challanId = ? AND deleted_at IS NULL
         `;
 
     db.query(query, [challanId], (err, result) => {
