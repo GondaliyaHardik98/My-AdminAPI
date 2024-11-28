@@ -30,12 +30,12 @@ const vendorAPI = {
       vendorRemark,
     } = req.body;
 
-    // if (!vendorName) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Missing required fields",
-    //   });
-    // }
+    if (!vendorName) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
 
     const query = `
         INSERT INTO vendormaster

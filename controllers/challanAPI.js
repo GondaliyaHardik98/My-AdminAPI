@@ -161,7 +161,7 @@ const challanAPI = {
 
       res.status(201).json({
         success: true,
-        message: "Challans created successfully",
+        message: "Challan created successfully",
         data: result,
       });
     });
@@ -279,7 +279,7 @@ const challanAPI = {
 
           res.status(200).json({
             success: true,
-            message: "Challans updated successfully",
+            message: "Challan updated successfully",
           });
         });
       } catch (error) {
@@ -288,7 +288,7 @@ const challanAPI = {
           console.error("Error in update transaction:", error);
           res.status(500).json({
             success: false,
-            message: "Error updating challans",
+            message: "Error updating challan",
             error: error.message,
           });
         });

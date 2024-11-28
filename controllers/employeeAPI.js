@@ -236,7 +236,7 @@ const employeeAPI = {
         });
       });
     } catch (error) {
-      console.error("Error in updateEmployee:", error);
+      console.error("Error in updating Employee:", error);
       res.status(500).json({
         success: false,
         message: "Internal server error",
