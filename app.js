@@ -20,6 +20,9 @@ app.use("/api", vendorRoutes);
 const productRouters = require("./routes/productRouter");
 app.use("/api", productRouters);
 
+const productMachineRouters = require("./routes/productMachineRouter");
+app.use("/api", productMachineRouters);
+
 const challanRouter = require("./routes/challanRouter");
 app.use("/api", challanRouter);
 

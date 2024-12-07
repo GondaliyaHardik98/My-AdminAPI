@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 27, 2024 at 06:04 PM
+-- Generation Time: Dec 07, 2024 at 10:51 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,10 +42,10 @@ CREATE TABLE `amcrecord` (
 --
 
 INSERT INTO `amcrecord` (`amcId`, `sellId`, `amcDate`, `amcRemark`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 3, '2025-11-28', NULL, '2024-11-10 20:24:39', NULL, NULL),
-(2, 4, '2025-11-13', NULL, '2024-11-10 21:01:51', NULL, NULL),
-(3, 5, '2025-11-13', NULL, '2024-11-10 21:02:09', NULL, '2024-11-11 10:17:21'),
-(4, 6, '2025-11-29', NULL, '2024-11-27 22:12:06', NULL, NULL);
+(1, 1, '2025-11-30', NULL, '2024-11-30 11:48:49', NULL, NULL),
+(2, 2, '2025-12-06', NULL, '2024-12-07 11:39:21', NULL, NULL),
+(3, 3, '2026-02-10', NULL, '2024-12-07 11:39:46', NULL, NULL),
+(4, 4, '2025-12-07', NULL, '2024-12-07 11:40:11', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -71,22 +71,20 @@ CREATE TABLE `challanmaster` (
 --
 
 INSERT INTO `challanmaster` (`challanId`, `customerId`, `productId`, `engineerId`, `challanPrice`, `challanDate`, `challanRemark`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(2, 2, 6, 3, 25, '2024-11-12', 'a', '2024-11-10 14:41:33', '2024-11-27 21:58:52', NULL),
-(3, 1, 6, 4, 362, '2024-11-19', 'csfs', '2024-11-10 14:41:33', '2024-11-12 01:21:58', NULL),
-(8, 4, 5, 4, 25, '2024-11-11', 'abgh', '2024-11-11 16:39:52', '2024-11-12 01:21:33', '2024-11-27 21:47:37'),
-(9, 4, 6, 3, 30, '2024-11-14', 'bbff', '2024-11-11 16:39:52', '2024-11-12 01:21:33', NULL),
-(10, 4, 5, 4, 25, '2024-11-13', 'abdd', '2024-11-11 16:43:24', '2024-11-12 01:21:33', '2024-11-27 21:48:16'),
-(11, 4, 6, 5, 30, '2024-11-21', 'bbdb', '2024-11-11 16:43:24', '2024-11-12 01:21:33', '2024-11-12 09:11:10'),
-(12, 2, 6, 4, 25121, '2024-11-13', 's', '2024-11-11 16:48:21', '2024-11-27 21:58:52', NULL),
-(13, 2, 6, 4, 322, '2024-11-12', 'b', '2024-11-11 16:48:21', '2024-11-27 21:58:52', NULL),
-(14, 3, 5, 3, 25, '2024-11-14', 'a', '2024-11-11 17:06:29', NULL, NULL),
-(15, 3, 6, 5, 352, '2024-11-12', 'b', '2024-11-11 17:06:29', NULL, NULL),
-(16, 1, 5, 3, 15112, '2024-11-14', 'sfsfsf', '2024-11-12 01:21:58', NULL, NULL),
-(17, 5, 6, 4, 10000, '2024-11-27', '1st', '2024-11-27 21:49:20', '2024-11-27 21:59:25', '2024-11-27 22:10:34'),
-(18, 5, 8, 5, 5000, '2024-11-28', '2nd', '2024-11-27 21:49:20', '2024-11-27 21:59:25', '2024-11-27 22:10:22'),
-(19, 2, 7, 3, 2522, '2024-11-27', 'j;l', '2024-11-27 21:58:39', '2024-11-27 21:58:52', '2024-11-27 22:10:26'),
-(20, 3, 6, 4, 25, '2024-11-28', '25', '2024-11-27 22:07:31', NULL, '2024-11-27 22:10:31'),
-(21, 2, 6, 3, 25, '2024-11-28', 'ada', '2024-11-27 22:10:12', NULL, '2024-11-27 22:10:28');
+(1, 2, 4, 2, 1600, '2024-09-22', NULL, '2024-11-30 11:44:19', '2024-11-30 12:15:54', '2024-11-30 12:16:16'),
+(2, 2, 6, 3, 60, '2024-07-26', NULL, '2024-11-30 11:56:10', '2024-11-30 12:15:54', '2024-11-30 12:16:12'),
+(3, 2, 4, 2, 450, '2024-11-11', NULL, '2024-11-30 11:59:28', NULL, '2024-11-30 11:59:57'),
+(4, 2, 6, 3, 60, '2024-07-29', NULL, '2024-11-30 11:59:28', NULL, '2024-11-30 11:59:50'),
+(5, 3, 14, 5, 450, '2024-09-23', NULL, '2024-11-30 12:13:55', NULL, NULL),
+(6, 2, 12, 3, 60, '2024-09-12', '', '2024-11-30 12:14:40', '2024-11-30 12:15:54', '2024-11-30 12:16:08'),
+(7, 2, 13, 6, 60, '2024-07-05', '', '2024-11-30 12:15:54', NULL, '2024-11-30 12:16:05'),
+(8, 2, 12, 6, 60, '2024-09-30', '', '2024-11-30 12:15:54', NULL, '2024-11-30 12:16:01'),
+(9, 2, 4, 2, 1800, '2024-09-24', NULL, '2024-11-30 12:16:38', '2024-11-30 12:19:25', NULL),
+(10, 2, 6, 3, 60, '2024-07-28', NULL, '2024-11-30 12:17:03', '2024-11-30 12:19:25', NULL),
+(11, 2, 12, 3, 50, '2024-09-12', NULL, '2024-11-30 12:17:32', '2024-11-30 12:19:25', NULL),
+(12, 2, 13, 6, 60, '2024-07-04', NULL, '2024-11-30 12:18:29', '2024-11-30 12:19:25', NULL),
+(13, 2, 12, 6, 60, '2024-07-04', NULL, '2024-11-30 12:18:29', '2024-11-30 12:19:25', NULL),
+(14, 2, 14, 7, 500, '2024-04-08', NULL, '2024-11-30 12:19:03', '2024-11-30 12:19:25', NULL);
 
 -- --------------------------------------------------------
 
@@ -131,12 +129,9 @@ CREATE TABLE `customer_table` (
 --
 
 INSERT INTO `customer_table` (`customerId`, `name`, `gstNo`, `mobileNo`, `address`, `remark`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Hardik Gondaliya', '4135', 24258, 'fs', 'sfs', '2024-10-29 22:08:00', '2024-11-27 21:22:26', '2024-11-27 21:29:14'),
-(2, 'Mitesh Boricha', '252525', 325236, 'secound test', 'done o', '2024-10-30 11:28:43', '2024-11-27 21:36:33', NULL),
-(3, 'Niraj Gondaliya', '522ll', 25641, 'Nansad road, kamrej, surat 394180', 'test 2', '2024-10-30 12:25:04', NULL, NULL),
-(4, 'Kaushal Gondaliya', '41', 24, 'fslkkmn', 'sfs njhn', '2024-10-30 12:25:30', NULL, NULL),
-(5, 'porch SERVICE', '251625', 956425, 'address', 'markss', '2024-11-27 21:15:47', NULL, NULL),
-(6, 'porch SERVICE', '251625', 956425, 'address', 'markss', '2024-11-27 21:17:37', NULL, NULL);
+(1, 'Customer 1', 'GS569874105', 2147483647, 'Amroli', 'Demo entry', '2024-11-30 10:48:10', NULL, NULL),
+(2, 'Manishbhai', 'NA', 2147483647, 'Miranagar', '', '2024-11-30 11:42:11', NULL, NULL),
+(3, 'bipinbhai', '', 2147483647, '', '', '2024-11-30 12:12:48', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -147,13 +142,13 @@ INSERT INTO `customer_table` (`customerId`, `name`, `gstNo`, `mobileNo`, `addres
 CREATE TABLE `employee_table` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `salary` int(11) DEFAULT NULL,
-  `contact_details` text DEFAULT NULL,
-  `emergency_contact_1` int(11) DEFAULT NULL,
+  `salary` int(11) NOT NULL,
+  `contact_details` text NOT NULL,
+  `emergency_contact_1` int(11) NOT NULL,
   `emergency_contact_2` int(11) DEFAULT NULL,
-  `photo` text DEFAULT NULL,
-  `id_proof` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
+  `photo` text NOT NULL,
+  `id_proof` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -163,13 +158,40 @@ CREATE TABLE `employee_table` (
 --
 
 INSERT INTO `employee_table` (`id`, `name`, `salary`, `contact_details`, `emergency_contact_1`, `emergency_contact_2`, `photo`, `id_proof`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'John Doe', 50000, 'john@example.com', 1234567890, 987654321, 'photo_url', 'proof123', '2024-10-29 17:22:08', NULL, '2024-11-05 10:04:42'),
-(2, 'John Doe33', 50006, 'john@example.com', 12345678, 987654321, 'photo_url', 'proof123', '2024-10-29 17:31:47', '2024-11-05 10:06:29', '2024-11-06 17:25:02'),
-(3, 'John Doe', 500005, 'john@example.com', 1234567890, 987654321, 'photo_url', 'proof123', '2024-10-29 19:00:00', '2024-11-27 21:36:13', NULL),
-(4, 'Niraj Gondaliya', 250000, '3265235', 21235252, 3254652, 'uploads/employees/photos/1730383472685-152679047.png', 'uploads/employees/documents/1730383472692-295506688.png', '2024-10-31 19:34:32', NULL, NULL),
-(5, 'Hardik Gondaliya', 2500000, '3265235', 1234567890, 3254652, 'uploads/employees/photos/1730788368677-957887924.JPG', 'uploads/employees/documents/1730788368716-259490792.JPG', '2024-11-05 12:02:48', NULL, NULL),
-(6, 'Mitesh Boricha', 25800, '3265235', 1234567890, 3254652, 'uploads/employees/photos/1732350464381-784683583.png', 'uploads/employees/documents/1732350464392-891090265.png', '2024-11-23 13:57:44', NULL, NULL),
-(7, 'porch SERVICE', 2563, 'john@example.com', 1234567890, 3254652, NULL, NULL, '2024-11-27 21:35:57', NULL, '2024-11-27 21:36:02');
+(1, 'Rakesh Makani', 0, '9327458885', 1236547890, 1236547890, 'uploads/employees/photos/1732943290159-178545357.jpg', 'uploads/employees/documents/1732943290162-456285985.png', '2024-11-30 10:38:10', NULL, NULL),
+(2, 'Mihir', 20000, '9033583359', 2147483647, 2147483647, 'uploads/employees/photos/1732947041607-693775285.jpg', 'uploads/employees/documents/1732947041616-82901813.png', '2024-11-30 11:40:41', NULL, NULL),
+(3, 'vipul', 20000, '6352318285', 2147483647, 2147483647, 'uploads/employees/photos/1732947939487-22072986.jpg', 'uploads/employees/documents/1732947939509-440332696.png', '2024-11-30 11:55:39', NULL, NULL),
+(4, 'sunny', 20000, '6352318285', 2147483647, 2147483647, 'uploads/employees/photos/1732948592348-38700281.jpg', 'uploads/employees/documents/1732948592349-734356613.png', '2024-11-30 12:06:32', NULL, NULL),
+(5, 'alpesh', 2000, '9033583359', 1236547890, 2147483647, 'uploads/employees/photos/1732948641660-488288976.jpg', 'uploads/employees/documents/1732948641662-433538873.png', '2024-11-30 12:07:21', NULL, NULL),
+(6, 'alok', 20000, '9033583359', 1236547890, 2147483647, 'uploads/employees/photos/1732948757828-472873141.jpg', 'uploads/employees/documents/1732948757829-939610708.png', '2024-11-30 12:09:17', NULL, NULL),
+(7, 'rutvik', 20000, '9327458885', 2147483647, 2147483647, 'uploads/employees/photos/1732948783340-789997252.jpg', 'uploads/employees/documents/1732948783401-456573880.png', '2024-11-30 12:09:43', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `productmachinemaster`
+--
+
+CREATE TABLE `productmachinemaster` (
+  `productId` int(11) NOT NULL,
+  `productMachineCode` varchar(100) DEFAULT NULL,
+  `vendorId` int(11) DEFAULT NULL,
+  `productName` varchar(255) DEFAULT NULL,
+  `productDesription` varchar(255) DEFAULT NULL,
+  `productPrice` int(11) DEFAULT NULL,
+  `productQuantity` int(11) DEFAULT NULL,
+  `productRemark` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `productmachinemaster`
+--
+
+INSERT INTO `productmachinemaster` (`productId`, `productMachineCode`, `vendorId`, `productName`, `productDesription`, `productPrice`, `productQuantity`, `productRemark`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'Machine 1', 2, NULL, NULL, NULL, NULL, NULL, '2024-12-07 14:21:40', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -195,6 +217,43 @@ CREATE TABLE `productmaster` (
 -- Dumping data for table `productmaster`
 --
 
+INSERT INTO `productmaster` (`productId`, `productCode`, `vendorId`, `productName`, `productDesription`, `productPrice`, `productQuantity`, `productRemark`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'Dummy_1', 1, 'Dummy Product 1', 'Demo product Entry', 25000, 3, 'Demo Entry', '2024-11-30 10:49:07', NULL, NULL),
+(2, 'Dummy_2', 1, 'Dummy Product 2', 'Dummy 2', 150, 3, 'Demo entry', '2024-11-30 10:49:36', NULL, NULL),
+(3, 'Dummy_3', 1, 'Dummy Product 3', 'Demo product entry', 750, 1, 'Demo Entry', '2024-11-30 10:50:01', NULL, NULL),
+(4, 'TMP_MTR', 2, 'Temperature Meter', '', 1800, 7, '', '2024-11-30 11:43:38', NULL, NULL),
+(5, 'MARUTI_01', 3, 'Maruti DM', '', 15000, 1, '', '2024-11-30 11:48:25', NULL, NULL),
+(6, 's1', 2, 'soras seal', '', 60, 100, '', '2024-11-30 11:53:08', NULL, NULL),
+(7, 's1', 2, 'soras seal', '', 60, 100, '', '2024-11-30 11:53:19', NULL, '2024-11-30 11:53:40'),
+(8, 's1', 2, 'soras seal', '', 60, 100, '', '2024-11-30 11:53:19', NULL, '2024-11-30 11:53:37'),
+(9, 's1', 2, 'soras seal', '', 60, 100, '', '2024-11-30 11:53:19', NULL, '2024-11-30 11:53:34'),
+(10, 's1', 2, 'soras seal', '', 60, 100, '', '2024-11-30 11:53:19', NULL, '2024-11-30 11:53:28'),
+(11, 's1', 2, 'soras seal', '', 60, 100, '', '2024-11-30 11:53:19', NULL, '2024-11-30 11:53:24'),
+(12, 't1', 2, 'top seal', '', 60, 0, '', '2024-11-30 12:00:28', NULL, NULL),
+(13, 'o1', 2, 'oil seal(12x24)', '', 40, 0, '', '2024-11-30 12:02:30', NULL, NULL),
+(14, 'ac', 2, 'ssr 25a ac', '', 500, 15, '', '2024-11-30 12:12:14', NULL, NULL),
+(15, 'M1', 2, 'Galaxy Machine', '', 10, 0, '', '2024-12-07 11:38:36', NULL, NULL),
+(16, 'M2', 2, 'Galaxy', '', 10, 0, '', '2024-12-07 11:38:46', NULL, NULL),
+(17, 'M3', 2, 'Ghanti', '', 10, 0, '', '2024-12-07 11:38:56', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `productmaster_view`
+-- (See below for the actual view)
+--
+CREATE TABLE `productmaster_view` (
+`productId` int(11)
+,`productMachineCode` varchar(100)
+,`vendorId` int(11)
+,`vendorName` varchar(200)
+,`productName` varchar(255)
+,`productDesription` varchar(255)
+,`productPrice` int(11)
+,`productQuantity` int(11)
+,`productRemark` varchar(255)
+,`deleted_at` datetime
+);
 
 -- --------------------------------------------------------
 
@@ -237,6 +296,10 @@ CREATE TABLE `salarymaster` (
 -- Dumping data for table `salarymaster`
 --
 
+INSERT INTO `salarymaster` (`salaryId`, `engineerId`, `salary`, `salaryDate`, `salaryMonth`, `salaryRemark`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 4, 50000, '2024-12-07', 'Dec', '', '2024-12-07 11:52:49', NULL, NULL),
+(2, 3, 2000, '2025-01-10', 'Jan', '', '2024-12-07 11:53:11', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -277,6 +340,11 @@ CREATE TABLE `sellmaster` (
 -- Dumping data for table `sellmaster`
 --
 
+INSERT INTO `sellmaster` (`sellId`, `productId`, `customerId`, `sellDate`, `sellPrice`, `sellQuantity`, `sellRemark`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 5, 1, '2024-11-30', 20000, 1, 'Payment pending', '2024-11-30 11:48:49', NULL, NULL),
+(2, 15, 2, '2024-12-06', 10000, 0, '', '2024-12-07 11:39:21', NULL, NULL),
+(3, 16, 2, '2025-02-10', 10, 0, '', '2024-12-07 11:39:46', NULL, NULL),
+(4, 15, 2, '2024-12-07', 10, 0, '', '2024-12-07 11:40:11', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -319,6 +387,10 @@ CREATE TABLE `vendormaster` (
 -- Dumping data for table `vendormaster`
 --
 
+INSERT INTO `vendormaster` (`vendorId`, `vendorName`, `vendorGSTNo`, `vendorMobileNo`, `vendorAddress`, `vendorRemark`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'Vendor 1', 'GS4546977774', 2147483647, 'Kamrej', 'Demo Entry', '2024-11-30 10:48:35', NULL, NULL),
+(2, 'Sanjaybhai (STORE)', 'NA', 2147483647, 'Store', '', '2024-11-30 11:42:52', NULL, NULL),
+(3, 'BHARAT', 'GS8855521', 2147483647, '', '', '2024-11-30 11:47:32', '2024-11-30 11:47:42', NULL);
 
 -- --------------------------------------------------------
 
@@ -328,6 +400,15 @@ CREATE TABLE `vendormaster` (
 DROP TABLE IF EXISTS `challan_view`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `challan_view`  AS SELECT `cm`.`challanId` AS `challanId`, `cm`.`customerId` AS `customerId`, `ct`.`name` AS `customarName`, `cm`.`productId` AS `productId`, `pm`.`productName` AS `productName`, `cm`.`engineerId` AS `engineerId`, `et`.`name` AS `engineerName`, `cm`.`challanPrice` AS `challanPrice`, `cm`.`challanDate` AS `challanDate`, `cm`.`challanRemark` AS `challanRemark`, `cm`.`deleted_at` AS `deleted_at` FROM (((`challanmaster` `cm` join `customer_table` `ct` on(`cm`.`customerId` = `ct`.`customerId`)) join `productmaster` `pm` on(`cm`.`productId` = `pm`.`productId`)) join `employee_table` `et` on(`cm`.`engineerId` = `et`.`id`)) WHERE `cm`.`deleted_at` is null ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `productmaster_view`
+--
+DROP TABLE IF EXISTS `productmaster_view`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `productmaster_view`  AS SELECT `pm`.`productId` AS `productId`, `pm`.`productMachineCode` AS `productMachineCode`, `pm`.`vendorId` AS `vendorId`, `vm`.`vendorName` AS `vendorName`, `pm`.`productName` AS `productName`, `pm`.`productDesription` AS `productDesription`, `pm`.`productPrice` AS `productPrice`, `pm`.`productQuantity` AS `productQuantity`, `pm`.`productRemark` AS `productRemark`, `pm`.`deleted_at` AS `deleted_at` FROM (`productmachinemaster` `pm` join `vendormaster` `vm` on(`pm`.`vendorId` = `vm`.`vendorId`)) WHERE `pm`.`deleted_at` is null ;
 
 -- --------------------------------------------------------
 
@@ -385,6 +466,12 @@ ALTER TABLE `employee_table`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `productmachinemaster`
+--
+ALTER TABLE `productmachinemaster`
+  ADD PRIMARY KEY (`productId`);
+
+--
 -- Indexes for table `productmaster`
 --
 ALTER TABLE `productmaster`
@@ -422,13 +509,13 @@ ALTER TABLE `amcrecord`
 -- AUTO_INCREMENT for table `challanmaster`
 --
 ALTER TABLE `challanmaster`
-  MODIFY `challanId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `challanId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `customer_table`
 --
 ALTER TABLE `customer_table`
-  MODIFY `customerId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `customerId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `employee_table`
@@ -437,28 +524,34 @@ ALTER TABLE `employee_table`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
+-- AUTO_INCREMENT for table `productmachinemaster`
+--
+ALTER TABLE `productmachinemaster`
+  MODIFY `productId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `productmaster`
 --
 ALTER TABLE `productmaster`
-  MODIFY `productId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `productId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `salarymaster`
 --
 ALTER TABLE `salarymaster`
-  MODIFY `salaryId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `salaryId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `sellmaster`
 --
 ALTER TABLE `sellmaster`
-  MODIFY `sellId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `sellId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `vendormaster`
 --
 ALTER TABLE `vendormaster`
-  MODIFY `vendorId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `vendorId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
