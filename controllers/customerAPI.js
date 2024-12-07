@@ -7,10 +7,10 @@ const customerAPI = {
 
     db.query(query, (err, results) => {
       if (err) {
-        console.error("Error fetching employees:", err);
+        console.error("Error fetching customer:", err);
         return res.status(500).json({
           success: false,
-          message: "Error fetching employees",
+          message: "Error fetching customer",
         });
       }
 
@@ -29,17 +29,17 @@ const customerAPI = {
 
     db.query(query, [customerId], (err, results) => {
       if (err) {
-        console.error("Error fetching employee:", err);
+        console.error("Error fetching customer:", err);
         return res.status(500).json({
           success: false,
-          message: "Error fetching employee",
+          message: "Error fetching customer",
         });
       }
 
       if (results.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Employee not found",
+          message: "Customer not found",
         });
       }
 
@@ -80,7 +80,7 @@ const customerAPI = {
 
       res.status(201).json({
         success: true,
-        message: "Employee created successfully",
+        message: "Customer created successfully",
         data: { id: result.insertId },
       });
     });
@@ -111,55 +111,55 @@ const customerAPI = {
 
     db.query(query, values, (err, result) => {
       if (err) {
-        console.error("Error updating employee:", err);
+        console.error("Error updating customer:", err);
         return res.status(500).json({
           success: false,
-          message: "Error updating employee",
+          message: "Error updating customer",
         });
       }
 
       if (result.affectedRows === 0) {
         return res.status(404).json({
           success: false,
-          message: "Employee not found",
+          message: "Customer not found",
         });
       }
 
       res.status(200).json({
         success: true,
-        message: "Employee updated successfully",
+        message: "Customer updated successfully",
       });
     });
   },
 
   // Soft delete data
   deleteEmployee: (req, res) => {
-    const employeeId = req.params.id;
+    const customerId = req.params.id;
     const query = `
-          UPDATE employee_table
+          UPDATE customer_table
           SET deleted_at = CURRENT_TIMESTAMP
           WHERE customerId = ? AND deleted_at IS NULL
         `;
 
-    db.query(query, [employeeId], (err, result) => {
+    db.query(query, [customerId], (err, result) => {
       if (err) {
-        console.error("Error deleting employee:", err);
+        console.error("Error deleting customer:", err);
         return res.status(500).json({
           success: false,
-          message: "Error deleting employee",
+          message: "Error deleting customer",
         });
       }
 
       if (result.affectedRows === 0) {
         return res.status(404).json({
           success: false,
-          message: "Employee not found",
+          message: "Customer not found",
         });
       }
 
       res.status(200).json({
         success: true,
-        message: "Employee deleted successfully",
+        message: "Customer deleted successfully",
       });
     });
   },

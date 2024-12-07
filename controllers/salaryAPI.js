@@ -1,15 +1,16 @@
 const db = require("../config/db");
 
-const vendorAPI = {
+const salaryAPI = {
   //Get all data
-  getAllVendor: (req, res) => {
-    const query = "SELECT * FROM vendormaster WHERE deleted_at IS NULL";
+  getAllSalary: (req, res) => {
+    const query = "SELECT * FROM salary_view ";
+
     db.query(query, (err, results) => {
       if (err) {
-        console.error("Error fetching vendor:", err);
+        console.error("Error fetching salary:", err);
         return res.status(500).json({
           success: false,
-          message: "Error fetching vendor",
+          message: "Error fetching salary",
         });
       }
 
@@ -21,16 +22,11 @@ const vendorAPI = {
   },
 
   // Create new data
-  createVendor: (req, res) => {
-    const {
-      vendorName,
-      vendorGSTNo,
-      vendorMobileNo,
-      vendorAddress,
-      vendorRemark,
-    } = req.body;
+  createSalary: (req, res) => {
+    const { engineerId, salary, salaryDate, salaryMonth, salaryRemark } =
+      req.body;
 
-    if (!vendorName) {
+    if (!engineerId) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
@@ -38,43 +34,37 @@ const vendorAPI = {
     }
 
     const query = `
-        INSERT INTO vendormaster
-        (vendorName, vendorGSTNo, vendorMobileNo, vendorAddress, vendorRemark) 
+        INSERT INTO salarymaster
+        (engineerId, salary, salaryDate, salaryMonth, salaryRemark) 
         VALUES (?, ?, ?, ?, ?)
       `;
 
-    const values = [
-      vendorName,
-      vendorGSTNo,
-      vendorMobileNo,
-      vendorAddress,
-      vendorRemark,
-    ];
+    const values = [engineerId, salary, salaryDate, salaryMonth, salaryRemark];
 
     db.query(query, values, (err, result) => {
       if (err) {
-        console.error("Error creating Vendor:", err);
+        console.error("Error creating salary:", err);
         return res.status(500).json({
           success: false,
-          message: "Error creating Vendor",
+          message: "Error creating salary",
         });
       }
 
       res.status(201).json({
         success: true,
-        message: "Vendor created successfully",
+        message: "Salary created successfully",
         data: { id: result.insertId },
       });
     });
   },
 
   //Update data
-  updateVendor: (req, res) => {
-    const customerId = req.params.id;
+  updateSalary: (req, res) => {
+    const salaryId = req.params.id;
     const updateData = req.body;
 
     // Remove any fields that shouldn't be updated directly
-    delete updateData.vendorid;
+    delete updateData.id;
     delete updateData.created_at;
     delete updateData.deleted_at;
 
@@ -84,67 +74,67 @@ const vendorAPI = {
       .join(", ");
 
     const query = `
-              UPDATE vendormaster
-              SET ${updateFields}, updated_at = CURRENT_TIMESTAMP
-              WHERE vendorId = ? AND deleted_at IS NULL
-            `;
+          UPDATE salarymaster
+          SET ${updateFields}, updated_at = CURRENT_TIMESTAMP
+          WHERE salaryId = ? AND deleted_at IS NULL
+        `;
 
-    const values = [...Object.values(updateData), customerId];
+    const values = [...Object.values(updateData), salaryId];
 
     db.query(query, values, (err, result) => {
       if (err) {
-        console.error("Error updating vendor:", err);
+        console.error("Error updating employee:", err);
         return res.status(500).json({
           success: false,
-          message: "Error updating vendor",
+          message: "Error updating salary",
         });
       }
 
       if (result.affectedRows === 0) {
         return res.status(404).json({
           success: false,
-          message: "vendor not found",
+          message: "Salary not found",
         });
       }
 
       res.status(200).json({
         success: true,
-        message: "vendor updated successfully",
+        message: "Salary updated successfully",
       });
     });
   },
 
   // Soft delete data
-  deleteVendor: (req, res) => {
-    const employeeId = req.params.id;
+  deleteSalary: (req, res) => {
+    const salaryId = req.params.id;
     const query = `
-          UPDATE vendormaster
+          UPDATE salarymaster
           SET deleted_at = CURRENT_TIMESTAMP
-          WHERE vendorId = ? AND deleted_at IS NULL
+          WHERE salaryId = ? AND deleted_at IS NULL
         `;
 
-    db.query(query, [employeeId], (err, result) => {
+    db.query(query, [salaryId], (err, result) => {
       if (err) {
-        console.error("Error deleting vendor:", err);
+        console.error("Error deleting employee:", err);
         return res.status(500).json({
           success: false,
-          message: "Error deleting vendor",
+          message: "Error deleting salary",
         });
       }
 
       if (result.affectedRows === 0) {
         return res.status(404).json({
           success: false,
-          message: "Vendor not found",
+          message: "Salary not found",
         });
       }
 
       res.status(200).json({
         success: true,
-        message: "Vendor deleted successfully",
+        message: "Salary deleted successfully",
       });
     });
   },
 };
 
-module.exports = { vendorAPI };
+module.exports = { salaryAPI };
