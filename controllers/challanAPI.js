@@ -1,10 +1,9 @@
 const db = require("../config/db");
 
 const challanAPI = {
-  //Get all Customer data
+  // Get all Customer data
   getCustomer: (req, res) => {
-    const query =
-      "SELECT customerId, name FROM customer_table WHERE deleted_at IS NULL";
+    const query = "SELECT customerId, name FROM customer_table WHERE deleted_at IS NULL";
 
     db.query(query, (err, results) => {
       if (err) {
@@ -17,15 +16,14 @@ const challanAPI = {
 
       res.status(200).json({
         success: true,
-        data: results,
+        data: results || [],
       });
     });
   },
 
-  //Get all Product data
+  // Get all Product data
   getProduct: (req, res) => {
-    const query =
-      "SELECT productId, productName FROM productmaster WHERE deleted_at IS NULL";
+    const query = "SELECT productId, productName, productPrice FROM productmaster WHERE deleted_at IS NULL";
 
     db.query(query, (err, results) => {
       if (err) {
@@ -38,15 +36,14 @@ const challanAPI = {
 
       res.status(200).json({
         success: true,
-        data: results,
+        data: results || [],
       });
     });
   },
 
-  //Get all Employee data
+  // Get all Employee data
   getEmployee: (req, res) => {
-    const query =
-      "SELECT id AS engineerId, name FROM employee_table WHERE deleted_at IS NULL";
+    const query = "SELECT id AS engineerId, name FROM employee_table WHERE deleted_at IS NULL";
 
     db.query(query, (err, results) => {
       if (err) {
@@ -59,14 +56,32 @@ const challanAPI = {
 
       res.status(200).json({
         success: true,
-        data: results,
+        data: results || [],
       });
     });
   },
 
-  //Get all data
+  // Get all Challan data
   getAllChallan: (req, res) => {
-    const query = "SELECT * FROM challan_view";
+    const query = `
+      SELECT cm.challanId, cm.customerId, ct.name AS customerName, cm.engineerId,
+             et.name AS engineerName, cm.challanDate AS date, cm.paymentType,
+             GROUP_CONCAT(
+               CONCAT(
+                 '{"productId":', cp.productId, 
+                 ',"productName":"', pm.productName, '",',
+                 '"price":', IFNULL(cp.price, 'null'), 
+                 ',"remark":"', IFNULL(cp.remark, ''), '"}'
+               )
+             ) AS products
+      FROM challanmaster cm
+      LEFT JOIN customer_table ct ON cm.customerId = ct.customerId
+      LEFT JOIN employee_table et ON cm.engineerId = et.id
+      LEFT JOIN challan_product cp ON cm.challanId = cp.challanId
+      LEFT JOIN productmaster pm ON cp.productId = pm.productId
+      WHERE cm.deleted_at IS NULL
+      GROUP BY cm.challanId
+    `;
 
     db.query(query, (err, results) => {
       if (err) {
@@ -77,20 +92,42 @@ const challanAPI = {
         });
       }
 
+      const formattedResults = results.map((row) => {
+        return {
+          ...row,
+          products: row.products ? JSON.parse(`[${row.products}]`) : [],
+        };
+      });
+
       res.status(200).json({
         success: true,
-        data: results,
+        data: formattedResults || [],
       });
     });
   },
 
-  //Get data by ID
+  // Get Challan by ID
   getChallanById: (req, res) => {
-    const customerId = req.params.id;
-    const query =
-      "SELECT * FROM challanmaster WHERE customerId = ? AND deleted_at IS NULL";
+    const challanId = req.params.id;
+    const query = `
+      SELECT cm.challanId, cm.customerId, cm.engineerId, cm.challanDate AS date, 
+             cm.paymentType,
+             GROUP_CONCAT(
+               CONCAT(
+                 '{"productId":', cp.productId, 
+                 ',"productName":"', pm.productName, '",',
+                 '"price":', IFNULL(cp.price, 'null'), 
+                 ',"remark":"', IFNULL(cp.remark, ''), '"}'
+               )
+             ) AS products
+      FROM challanmaster cm
+      LEFT JOIN challan_product cp ON cm.challanId = cp.challanId
+      LEFT JOIN productmaster pm ON cp.productId = pm.productId
+      WHERE cm.challanId = ? AND cm.deleted_at IS NULL
+      GROUP BY cm.challanId
+    `;
 
-    db.query(query, [customerId], (err, results) => {
+    db.query(query, [challanId], (err, results) => {
       if (err) {
         console.error("Error fetching challan:", err);
         return res.status(500).json({
@@ -106,175 +143,115 @@ const challanAPI = {
         });
       }
 
-      // Ensure the response is always an array
+      const formattedResult = {
+        ...results[0],
+        products: results[0].products ? JSON.parse(`[${results[0].products}]`) : [],
+      };
+
       res.status(200).json({
         success: true,
-        data: Array.isArray(results) ? results : [results],
+        data: formattedResult,
       });
     });
   },
 
+  // Create Challan
   createChallan: (req, res) => {
-    console.log("Received request body:", req.body);
+    const { customerId, engineerId, challanDate, paymentType, products } = req.body;
 
-    // Ensure the outer structure is an array
-    if (!Array.isArray(req.body)) {
-      return res.status(400).json({
-        success: false,
-        message: "Request body must be an array of challan arrays",
-        receivedData: req.body,
-      });
+    if (!customerId || !engineerId || !products || products.length === 0) {
+      return res.status(400).json({ success: false, message: "All fields are required." });
     }
 
-    // Flatten the input array of arrays
-    const challanData = req.body.flat();
-
-    // Prepare batch insert query
     const query = `
-      INSERT INTO challanmaster
-      (customerId, productId, engineerId, challanPrice, challanDate, challanRemark) 
-      VALUES ?
+      INSERT INTO challanmaster (customerId, engineerId, challanDate, paymentType)
+      VALUES (?, ?, ?, ?)
     `;
+    const challanValues = [customerId, engineerId, challanDate, paymentType];
 
-    // Prepare values for batch insert
-    const values = challanData.map((challan) => [
-      challan.customerId,
-      challan.productId,
-      challan.engineerId || null,
-      challan.challanPrice || null,
-      challan.challanDate || new Date().toISOString().split("T")[0],
-      challan.challanRemark || null,
-    ]);
-
-    console.log("Executing batch insert with values:", values);
-
-    // Execute batch insert
-    db.query(query, [values], (err, result) => {
+    db.query(query, challanValues, (err, result) => {
       if (err) {
-        console.error("Error creating challans:", err);
-        return res.status(500).json({
-          success: false,
-          message: "Error creating challans",
-          error: err.message,
-        });
+        console.error("Error creating challan:", err);
+        return res.status(500).json({ success: false, message: "Error creating challan." });
       }
 
-      res.status(201).json({
-        success: true,
-        message: "Challan created successfully",
-        data: result,
-      });
-    });
-  },
+      const challanId = result.insertId;
 
-  //Update data
-  updateChallan: (req, res) => {
-    const customerId = req.params.id;
-    const challanData = req.body;
+      const productQuery = `
+        INSERT INTO challan_product (challanId, productId, price, remark)
+        VALUES ?
+      `;
+      const productValues = products.map((p) => [
+        challanId,
+        p.productId,
+        p.price,
+        p.remark,
+      ]);
 
-    if (!Array.isArray(challanData) || challanData.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid request format. Expecting an array of challan entries",
-      });
-    }
-
-    // Start a transaction
-    db.beginTransaction(async (err) => {
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          message: "Error starting transaction",
-          error: err.message,
-        });
-      }
-
-      try {
-        // 1. Soft delete existing records that are not in the update list
-        const challanIds = challanData
-          .filter((item) => item.challanId)
-          .map((item) => item.challanId);
-
-        let deleteQuery;
-        let deleteParams;
-
-        if (challanIds.length > 0) {
-          // If we have challanIds, exclude them from deletion
-          deleteQuery = `
-            UPDATE challanmaster 
-            SET deleted_at = CURRENT_TIMESTAMP 
-            WHERE customerId = ? 
-            AND deleted_at IS NULL 
-            AND challanId NOT IN (${challanIds.map(() => "?").join(",")})
-          `;
-          deleteParams = [customerId, ...challanIds];
-        } else {
-          // If no challanIds, soft delete all records for this customer
-          deleteQuery = `
-            UPDATE challanmaster 
-            SET deleted_at = CURRENT_TIMESTAMP 
-            WHERE customerId = ? 
-            AND deleted_at IS NULL
-          `;
-          deleteParams = [customerId];
-        }
-
-        await new Promise((resolve, reject) => {
-          db.query(deleteQuery, deleteParams, (err) =>
-            err ? reject(err) : resolve()
-          );
-        });
-
-        // 2. Update existing records and insert new ones
-        for (const item of challanData) {
-          const query = item.challanId
-            ? `
-              UPDATE challanmaster 
-              SET 
-                productId = ?,
-                engineerId = ?,
-                challanPrice = ?,
-                challanDate = ?,
-                challanRemark = ?,
-                updated_at = CURRENT_TIMESTAMP,
-                deleted_at = NULL
-              WHERE challanId = ? AND customerId = ?
-            `
-            : `
-              INSERT INTO challanmaster 
-              (customerId, productId, engineerId, challanPrice, challanDate, challanRemark)
-              VALUES (?, ?, ?, ?, ?, ?)
-            `;
-
-          const values = item.challanId
-            ? [
-                item.productId,
-                item.engineerId,
-                item.challanPrice,
-                item.challanDate || new Date().toISOString().split("T")[0],
-                item.challanRemark,
-                item.challanId,
-                customerId,
-              ]
-            : [
-                customerId,
-                item.productId,
-                item.engineerId,
-                item.challanPrice,
-                item.challanDate || new Date().toISOString().split("T")[0],
-                item.challanRemark,
-              ];
-
-          await new Promise((resolve, reject) => {
-            db.query(query, values, (err) => (err ? reject(err) : resolve()));
+      db.query(productQuery, [productValues], (err) => {
+        if (err) {
+          console.error("Error adding products:", err);
+          return res.status(500).json({
+            success: false,
+            message: "Error adding products to challan",
           });
         }
 
-        // Commit transaction
-        db.commit((err) => {
+        res.status(201).json({
+          success: true,
+          message: "Challan created successfully",
+        });
+      });
+    });
+  },
+
+  // Update Challan
+  updateChallan: (req, res) => {
+    const challanId = req.params.id;
+    const { customerId, engineerId, challanDate, paymentType, products } = req.body;
+
+    if (!challanId || !customerId || !engineerId || !products || products.length === 0) {
+      return res.status(400).json({ success: false, message: "All fields are required." });
+    }
+
+    const challanQuery = `
+      UPDATE challanmaster
+      SET customerId = ?, engineerId = ?, challanDate = ?, paymentType = ?
+      WHERE challanId = ?
+    `;
+    const challanValues = [customerId, engineerId, challanDate, paymentType, challanId];
+
+    db.query(challanQuery, challanValues, (err) => {
+      if (err) {
+        console.error("Error updating challan:", err);
+        return res.status(500).json({ success: false, message: "Error updating challan." });
+      }
+
+      const deleteProductQuery = "DELETE FROM challan_product WHERE challanId = ?";
+      db.query(deleteProductQuery, [challanId], (err) => {
+        if (err) {
+          console.error("Error deleting products:", err);
+          return res.status(500).json({ success: false, message: "Error updating products." });
+        }
+
+        const productQuery = `
+          INSERT INTO challan_product (challanId, productId, price, remark)
+          VALUES ?
+        `;
+        const productValues = products.map((p) => [
+          challanId,
+          p.productId,
+          p.price,
+          p.remark,
+        ]);
+
+        db.query(productQuery, [productValues], (err) => {
           if (err) {
-            throw err;
+            console.error("Error updating products:", err);
+            return res.status(500).json({
+              success: false,
+              message: "Error updating products in challan",
+            });
           }
 
           res.status(200).json({
@@ -282,28 +259,19 @@ const challanAPI = {
             message: "Challan updated successfully",
           });
         });
-      } catch (error) {
-        // Rollback on error
-        db.rollback(() => {
-          console.error("Error in update transaction:", error);
-          res.status(500).json({
-            success: false,
-            message: "Error updating challan",
-            error: error.message,
-          });
-        });
-      }
+      });
     });
   },
 
-  // Soft delete data
+  // Delete Challan
   deleteChallan: (req, res) => {
     const challanId = req.params.id;
+
     const query = `
-          UPDATE challanmaster
-          SET deleted_at = CURRENT_TIMESTAMP
-          WHERE challanId = ? AND deleted_at IS NULL
-        `;
+      UPDATE challanmaster
+      SET deleted_at = CURRENT_TIMESTAMP
+      WHERE challanId = ?
+    `;
 
     db.query(query, [challanId], (err, result) => {
       if (err) {
@@ -317,13 +285,13 @@ const challanAPI = {
       if (result.affectedRows === 0) {
         return res.status(404).json({
           success: false,
-          message: "Challan not found",
+          message: "Challan not found or already deleted.",
         });
       }
 
       res.status(200).json({
         success: true,
-        message: "Challan deleted successfully",
+        message: "Challan deleted successfully.",
       });
     });
   },

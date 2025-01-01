@@ -32,4 +32,7 @@ app.use("/api", salaryRouter);
 const sellRouter = require("./routes/sellRouter");
 app.use("/api", sellRouter);
 
+const amcRouter = require("./routes/amcRouter");
+app.use("/api", amcRouter);
+
 module.exports = app;

@@ -1,246 +1,116 @@
 const db = require("../config/db");
 
 const sellAPI = {
-  getAMCData: (req, res) => {
-    const query = "SELECT * FROM amcrecord WHERE deleted_at IS NULL";
+  // Fetch all sell records
+  getAllSellRecords: (req, res) => {
+    const query = `
+      SELECT sm.sellId, sm.customerId, ct.name AS customerName, sm.productId, pm.productName,
+             sm.sellDate, sm.price, IFNULL(SUM(i.amountPaid), 0) AS totalPaid,
+             (sm.price - IFNULL(SUM(i.amountPaid), 0)) AS balance, sm.remark
+      FROM sellmaster sm
+      LEFT JOIN customer_table ct ON sm.customerId = ct.customerId
+      LEFT JOIN productmaster pm ON sm.productId = pm.productId
+      LEFT JOIN installments i ON sm.sellId = i.sellId
+      WHERE sm.deleted_at IS NULL
+      GROUP BY sm.sellId;
+    `;
 
     db.query(query, (err, results) => {
       if (err) {
-        console.error("Error fetching Product:", err);
-        return res.status(500).json({
-          success: false,
-          message: "Error fetching Product",
-        });
+        console.error("Error fetching sell records:", err);
+        return res.status(500).json({ success: false, message: "Error fetching sell records." });
       }
 
-      res.status(200).json({
-        success: true,
-        data: results,
-      });
+      res.status(200).json({ success: true, data: results || [] });
     });
   },
 
-  getAllSellData: (req, res) => {
-    const query = "SELECT * FROM sell_view";
-
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error("Error fetching Product:", err);
-        return res.status(500).json({
-          success: false,
-          message: "Error fetching Product",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        data: results,
-      });
-    });
-  },
-
-  // Create new data
+  // Add a new sell record
   createSell: (req, res) => {
-    const {
-      productId,
-      customerId,
-      sellDate,
-      sellPrice,
-      sellQuantity,
-      sellRemark,
-    } = req.body;
+    const { customerId, productId, sellDate, price, remark } = req.body;
 
-    if (!productId) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required fields",
-      });
+    if (!customerId || !productId || !sellDate || !price) {
+      return res.status(400).json({ success: false, message: "All fields are required." });
     }
 
-    // First query to insert into sellmaster
-    const sellmasterQuery = `
-      INSERT INTO sellmaster
-      (productId, customerId, sellDate, sellPrice, sellQuantity, sellRemark)
-      VALUES (?, ?, ?, ?, ?, ?)
+    const query = `
+      INSERT INTO sellmaster (customerId, productId, sellDate, price, remark)
+      VALUES (?, ?, ?, ?, ?)
     `;
+    const values = [customerId, productId, sellDate, price, remark || null];
 
-    const sellmasterValues = [
-      productId,
-      customerId,
-      sellDate,
-      sellPrice,
-      sellQuantity,
-      sellRemark,
-    ];
-
-    db.query(sellmasterQuery, sellmasterValues, (err, sellResult) => {
+    db.query(query, values, (err, result) => {
       if (err) {
-        console.error("Error creating sell:", err);
-        return res.status(500).json({
-          success: false,
-          message: "Error creating sell",
-        });
+        console.error("Error creating sell record:", err);
+        return res.status(500).json({ success: false, message: "Error creating sell record." });
       }
 
-      const sellId = sellResult.insertId; // Get the ID of the new sell record
+      const sellId = result.insertId;
 
-      // Calculate AMCDate as sellDate + 365 days
-      const amcDateQuery = `DATE_ADD(?, INTERVAL 365 DAY)`;
-
-      // Second query to insert into AMCREcord
-      const amcRecordQuery = `
-        INSERT INTO AMCREcord
-        (SellID, AMCDate)
-        VALUES (?, ${amcDateQuery})
+      // Create AMC record automatically
+      const amcQuery = `
+        INSERT INTO amc_record (sellId, customerId, productId, sellDate, maintenanceStartDate)
+        VALUES (?, ?, ?, ?, DATE_ADD(?, INTERVAL 1 YEAR))
       `;
+      const amcValues = [sellId, customerId, productId, sellDate, sellDate];
 
-      const amcRecordValues = [sellId, sellDate];
-
-      db.query(amcRecordQuery, amcRecordValues, (amcErr, amcResult) => {
-        if (amcErr) {
-          console.error("Error creating AMC record:", amcErr);
-          return res.status(500).json({
-            success: false,
-            message: "Error creating AMC record",
-          });
+      db.query(amcQuery, amcValues, (err) => {
+        if (err) {
+          console.error("Error creating AMC record:", err);
+          return res.status(500).json({ success: false, message: "Error creating AMC record." });
         }
 
-        res.status(201).json({
-          success: true,
-          message: "Sell and AMC record created successfully",
-          data: { sellId: sellResult.insertId, amcId: amcResult.insertId },
-        });
+        res.status(201).json({ success: true, message: "Sell record and AMC created successfully." });
       });
     });
   },
 
-  //   //Update data
-  updateSell: (req, res) => {
-    const { id } = req.params; // Sell ID
-    const {
-      productId,
-      customerId,
-      sellDate,
-      sellPrice,
-      sellQuantity,
-      sellRemark,
-    } = req.body;
+  // Add installment
+  addInstallment: (req, res) => {
+    const { sellId, amountPaid, paymentDate, remark } = req.body;
 
-    if (!sellDate) {
-      return res.status(400).json({
-        success: false,
-        message: "sellDate is required for updating AMCDate",
-      });
+    if (!sellId || !amountPaid || !paymentDate) {
+      return res.status(400).json({ success: false, message: "All fields are required." });
     }
 
-    // Update the sellmaster table with all provided fields
-    const updateSellmasterQuery = `
-      UPDATE sellmaster
-      SET productId = ?, customerId = ?, sellDate = ?, sellPrice = ?, sellQuantity = ?, sellRemark = ?
+    const query = `
+      INSERT INTO installments (sellId, amountPaid, paymentDate, remark)
+      VALUES (?, ?, ?, ?)
+    `;
+    const values = [sellId, amountPaid, paymentDate, remark || null];
+
+    db.query(query, values, (err) => {
+      if (err) {
+        console.error("Error adding installment:", err);
+        return res.status(500).json({ success: false, message: "Error adding installment." });
+      }
+
+      res.status(201).json({ success: true, message: "Installment added successfully." });
+    });
+  },
+
+  // Fetch installment history for a sell record
+  getInstallmentHistory: (req, res) => {
+    const sellId = req.params.sellId;
+
+    if (!sellId) {
+      return res.status(400).json({ success: false, message: "Sell ID is required." });
+    }
+
+    const query = `
+      SELECT installmentId, sellId, amountPaid, paymentDate, remark
+      FROM installments
       WHERE sellId = ?
+      ORDER BY paymentDate ASC;
     `;
 
-    const sellmasterValues = [
-      productId,
-      customerId,
-      sellDate,
-      sellPrice,
-      sellQuantity,
-      sellRemark,
-      id,
-    ];
-
-    db.query(updateSellmasterQuery, sellmasterValues, (err, sellResult) => {
+    db.query(query, [sellId], (err, results) => {
       if (err) {
-        console.error("Error updating sellmaster:", err);
-        return res.status(500).json({
-          success: false,
-          message: "Error updating sellmaster record",
-        });
+        console.error("Error fetching installment history:", err);
+        return res.status(500).json({ success: false, message: "Error fetching installment history." });
       }
 
-      if (sellResult.affectedRows === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "Sell record not found",
-        });
-      }
-
-      // Calculate new AMCDate as sellDate + 365 days
-      const amcDateQuery = `DATE_ADD(?, INTERVAL 365 DAY)`;
-
-      // Update AMCDate in AMCREcord based on the new sellDate
-      const updateAmcRecordQuery = `
-        UPDATE AMCREcord
-        SET AMCDate = ${amcDateQuery}
-        WHERE SellID = ?
-      `;
-
-      db.query(updateAmcRecordQuery, [sellDate, id], (amcErr, amcResult) => {
-        if (amcErr) {
-          console.error("Error updating AMCDate in AMCREcord:", amcErr);
-          return res.status(500).json({
-            success: false,
-            message: "Error updating AMCDate in AMCREcord",
-          });
-        }
-
-        res.status(200).json({
-          success: true,
-          message: "Sell and AMC records updated successfully",
-        });
-      });
-    });
-  },
-
-  //   // Soft delete data
-  deleteSell: (req, res) => {
-    const sellId = req.params.id;
-
-    // First query to update deleted_at in productmaster
-    const deleteProductQuery = `
-      UPDATE sellmaster
-      SET deleted_at = CURRENT_TIMESTAMP
-      WHERE sellId = ? AND deleted_at IS NULL
-    `;
-
-    db.query(deleteProductQuery, [sellId], (productErr, productResult) => {
-      if (productErr) {
-        console.error("Error deleting product:", productErr);
-        return res.status(500).json({
-          success: false,
-          message: "Error deleting sell",
-        });
-      }
-
-      if (productResult.affectedRows === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "Sell not found",
-        });
-      }
-
-      // Second query to update deleted_at in AMCREcord table based on productId
-      const deleteAmcRecordQuery = `
-        UPDATE AMCREcord
-        SET deleted_at = CURRENT_TIMESTAMP
-        WHERE sellId = ? AND deleted_at IS NULL
-      `;
-
-      db.query(deleteAmcRecordQuery, [sellId], (amcErr, amcResult) => {
-        if (amcErr) {
-          console.error("Error deleting AMC record:", amcErr);
-          return res.status(500).json({
-            success: false,
-            message: "Error deleting AMC record",
-          });
-        }
-
-        res.status(200).json({
-          success: true,
-          message: "Sell and associated AMC record deleted successfully",
-        });
-      });
+      res.status(200).json({ success: true, data: results || [] });
     });
   },
 };
