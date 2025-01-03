@@ -32,15 +32,15 @@ const employeeAPI = {
     }
 
     const query = `
-      INSERT INTO employee_table (name, salary, contact_details, emergency_contact_1, emergency_contact_2)
-      VALUES (?, ?, ?, ?, ?, )
+      INSERT INTO employee_table (name, salary, contact_details, emergency_contact_1, emergency_contact_2, photo, id_proof)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const values = [name, salary, contact_details, emergency_contact_1, emergency_contact_2];
+    const values = [name, salary, contact_details, emergency_contact_1, emergency_contact_2 || null, photo, id_proof];
 
     db.query(query, values, (err) => {
       if (err) {
         console.error("Error creating employee:", err);
-        return res.status(500).json({ success: false, message: "Error while creating employee." });
+        return res.status(500).json({ success: false, message: "Error creating employee." });
       }
       res.status(201).json({ success: true, message: "Employee added successfully." });
     });
