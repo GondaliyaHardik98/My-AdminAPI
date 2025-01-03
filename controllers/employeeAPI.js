@@ -20,6 +20,7 @@ const employeeAPI = {
 
   // Add a new employee
   createEmployee: (req, res) => {
+    console.log("Create emp : ", req.body);
     const { name, salary, contact_details, emergency_contact_1, emergency_contact_2 } = req.body;
     const photo = req.files?.photo?.[0]?.filename || null;
     const id_proof = req.files?.id_proof?.[0]?.filename || null;
