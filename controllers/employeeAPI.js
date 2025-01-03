@@ -32,10 +32,10 @@ const employeeAPI = {
     }
 
     const query = `
-      INSERT INTO employee_table (name, salary, contact_details, emergency_contact_1, emergency_contact_2, photo, id_proof)
+      INSERT INTO employee_table (name, salary, contact_details, emergency_contact_1, emergency_contact_2)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const values = [name, salary, contact_details, emergency_contact_1, emergency_contact_2 || null, photo, id_proof];
+    const values = [name, salary, contact_details, emergency_contact_1, emergency_contact_2];
 
     db.query(query, values, (err) => {
       if (err) {
