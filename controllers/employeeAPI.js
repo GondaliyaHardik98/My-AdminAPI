@@ -24,6 +24,8 @@ const employeeAPI = {
     const photo = req.files?.photo?.[0]?.filename || null;
     const id_proof = req.files?.id_proof?.[0]?.filename || null;
 
+    console.log("data: " + name + " " + salary + ", " + contact_details + ", " + emergency_contact_1 + ", " + emergency_contact_2);
+
     if (!name || !salary || !contact_details || !emergency_contact_1) {
       return res.status(400).json({ success: false, message: "All required fields must be provided." });
     }
