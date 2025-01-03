@@ -40,7 +40,7 @@ const employeeAPI = {
     db.query(query, values, (err) => {
       if (err) {
         console.error("Error creating employee:", err);
-        return res.status(500).json({ success: false, message: "Error creating employee." });
+        return res.status(500).json({ success: false, message: "Error while creating employee." });
       }
       res.status(201).json({ success: true, message: "Employee added successfully." });
     });
