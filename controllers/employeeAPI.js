@@ -20,7 +20,8 @@ const employeeAPI = {
 
   // Add a new employee
   createEmployee: (req, res) => {
-    console.log("Create emp : ", req.body);
+    console.log("Request Body:", req.body);
+    console.log("Uploaded Files:", req.files);
     const { name, salary, contact_details, emergency_contact_1, emergency_contact_2 } = req.body;
     const photo = req.files?.photo?.[0]?.filename || null;
     const id_proof = req.files?.id_proof?.[0]?.filename || null;
@@ -39,8 +40,9 @@ const employeeAPI = {
 
     db.query(query, values, (err) => {
       if (err) {
+        console.error("Error creating employee:", err.message, err.stack);
         console.error("Error creating employee:", err);
-        return res.status(500).json({ success: false, message: "Error while creating employee." });
+        return res.status(500).json({ success: false, message: "Error while creating employee. \n" + err.message + "\n" + err.stack });
       }
       res.status(201).json({ success: true, message: "Employee added successfully." });
     });
