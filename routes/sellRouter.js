@@ -15,3 +15,5 @@ router.post("/sell/installment", sellAPI.addInstallment);
 router.get("/sell/installments/:sellId", sellAPI.getInstallmentHistory);
 
 module.exports = router;
+
+
