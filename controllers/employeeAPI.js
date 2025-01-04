@@ -20,32 +20,35 @@ const employeeAPI = {
 
   // Add a new employee
   createEmployee: (req, res) => {
-    console.log("Request Body:", req.body);
-    console.log("Uploaded Files:", req.files);
-    const { name, salary, contact_details, emergency_contact_1, emergency_contact_2 } = req.body;
-    const photo = req.files?.photo?.[0]?.filename || null;
-    const id_proof = req.files?.id_proof?.[0]?.filename || null;
-
-    console.log("data: " + name + " " + salary + ", " + contact_details + ", " + emergency_contact_1 + ", " + emergency_contact_2);
-
-    if (!name || !salary || !contact_details || !emergency_contact_1) {
-      return res.status(400).json({ success: false, message: "All required fields must be provided." });
-    }
-
-    const query = `
-      INSERT INTO employee_table (name, salary, contact_details, emergency_contact_1, emergency_contact_2, photo, id_proof)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    const values = [name, salary, contact_details, emergency_contact_1, emergency_contact_2 || null, photo, id_proof];
-
-    db.query(query, values, (err) => {
-      if (err) {
-        console.error("Error creating employee:", err.message, err.stack);
-        console.error("Error creating employee:", err);
-        return res.status(500).json({ success: false, message: "Error while creating employee. \n" + err.message + "\n" + err.stack });
+    try {
+      console.log("Request Body:", req.body);
+      console.log("Uploaded Files:", req.files);
+  
+      const { name, salary, contact_details, emergency_contact_1, emergency_contact_2 } = req.body;
+      const photo = req.files?.photo?.[0]?.filename || null;
+      const id_proof = req.files?.id_proof?.[0]?.filename || null;
+  
+      if (!name || !salary || !contact_details || !emergency_contact_1) {
+        return res.status(400).json({ success: false, message: "All required fields must be provided." });
       }
-      res.status(201).json({ success: true, message: "Employee added successfully." });
-    });
+  
+      const query = `
+        INSERT INTO employee_table (name, salary, contact_details, emergency_contact_1, emergency_contact_2, photo, id_proof)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+      const values = [name, salary, contact_details, emergency_contact_1, emergency_contact_2 || null, photo, id_proof];
+  
+      db.query(query, values, (err) => {
+        if (err) {
+          console.error("SQL Error:", err.message, err.stack);
+          return res.status(500).json({ success: false, message: "Database error occurred." });
+        }
+        res.status(201).json({ success: true, message: "Employee added successfully." });
+      });
+    } catch (err) {
+      console.error("Unhandled Error:", err.message, err.stack);
+      res.status(500).json({ success: false, message: "Internal server error." });
+    }
   },
 
   // Update an employee
