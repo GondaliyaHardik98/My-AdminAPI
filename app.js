@@ -3,13 +3,29 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 
+const dotenv = require("dotenv");
+dotenv.config();
+
+
 
 
 // Middleware
 app.use(cors());
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something went wrong!');
+});
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 // Routes
+
+const authRouter = require("./routes/authRouter");
+app.use("/api/auth", authRouter);
+
 const employeeRoutes = require("./routes/employeeRouter");
 app.use("/api", employeeRoutes);
 

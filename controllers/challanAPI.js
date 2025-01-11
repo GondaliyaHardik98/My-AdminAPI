@@ -157,6 +157,10 @@ const challanAPI = {
 
   // Create Challan
   createChallan: (req, res) => {
+
+    console.log("Received payload:", req.body);
+
+
     const { customerId, engineerId, challanDate, paymentType, products } = req.body;
 
     if (!customerId || !engineerId || !products || products.length === 0) {
@@ -187,6 +191,8 @@ const challanAPI = {
         p.price,
         p.remark,
       ]);
+
+      console.log("Product values for insertion:", productValues);
 
       db.query(productQuery, [productValues], (err) => {
         if (err) {
