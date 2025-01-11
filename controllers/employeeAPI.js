@@ -3,6 +3,7 @@ const db = require("../config/db");
 const employeeAPI = {
   // Fetch all employees
   getAllEmployees: (req, res) => {
+    console.log("Get All Employees");
     const query = `
       SELECT id, name, salary, contact_details, emergency_contact_1, 
              emergency_contact_2, photo, id_proof 

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { vendorAPI } = require("../controllers/VendorAPI");
+const { vendorAPI } = require("../controllers/vendorAPI");
 
 router.get("/vendor", vendorAPI.getAllVendor);
 router.post("/vendor", vendorAPI.createVendor);

@@ -1,6 +1,11 @@
 const app = require("./app");
-const port = 3002;
+const PORT = 3003;
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.get('/', (req, res) => {
+  res.send('Backend is working!');
 });
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Bharat Server is running on port ${PORT}`);
+});
+
