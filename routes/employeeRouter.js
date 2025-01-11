@@ -2,6 +2,12 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const { employeeAPI } = require("../controllers/employeeAPI");
+const { checkRoles } = require("../middlewares/checkRoles.js");
+
+
+router.get("/employees", checkRoles(["Super Admin", "Admin"]), employeeAPI.getAllEmployees);
+router.post("/employees", checkRoles(["Super Admin", "Admin"]), employeeAPI.createEmployee);
+
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
