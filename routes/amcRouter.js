@@ -4,7 +4,7 @@ const { amcAPI } = require("../controllers/amcAPI");
 
 // Routes
 router.get("/amc", amcAPI.getAllAMCRecords);
-router.put("/amc", amcAPI.updateAMCRecord);
+router.put("/amc/:id", amcAPI.updateAMCRecord);
 router.post("/amc", amcAPI.createAMCRecord);
 
 

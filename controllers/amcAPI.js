@@ -10,7 +10,6 @@ const amcAPI = {
       FROM amc_record ar
       LEFT JOIN customer_table ct ON ar.customerId = ct.customerId
       LEFT JOIN productmaster pm ON ar.productId = pm.productId
-      WHERE ar.maintenanceEndDate IS NULL OR ar.maintenanceEndDate > CURRENT_DATE;
     `;
 
     db.query(query, (err, results) => {
@@ -74,11 +73,14 @@ const amcAPI = {
         amcPrice,
       ];
 
+      
+      
       db.query(createAMCQuery, values, (err) => {
         if (err) {
           console.error("Error inserting AMC record:", err);
           return res.status(500).json({ success: false, message: "Error creating AMC record." });
         }
+        
 
         res.status(201).json({ success: true, message: "AMC record created successfully." });
       });
