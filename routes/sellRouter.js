@@ -14,6 +14,9 @@ router.post("/sell/installment", sellAPI.addInstallment);
 // Route to fetch installment history for a specific sell record
 router.get("/sell/installments/:sellId", sellAPI.getInstallmentHistory);
 
+router.put("/sell/:id", sellAPI.updateSell);
+
+
 module.exports = router;
 
 

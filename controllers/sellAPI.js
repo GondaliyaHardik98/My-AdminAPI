@@ -1,5 +1,6 @@
 const db = require("../config/db");
 
+const { amcAPI } = require("../controllers/amcAPI");
 
 
 const sellAPI = {
@@ -30,42 +31,39 @@ const sellAPI = {
   // Add a new sell record
   createSell: (req, res) => {
     const { customerId, productId, sellDate, price, remark } = req.body;
-
-    if (!customerId || !productId || !sellDate || !price) {
-      return res.status(400).json({ success: false, message: "All fields are required." });
+  
+    if (!customerId || !productId || !sellDate) {
+      return res.status(400).json({ success: false, message: "Customer, Product, and Sell Date are required." });
     }
-
+  
     const query = `
       INSERT INTO sellmaster (customerId, productId, sellDate, price, remark)
       VALUES (?, ?, ?, ?, ?)
     `;
-    const values = [customerId, productId, sellDate, price, remark || null];
-
+    const values = [customerId, productId, sellDate, price || null, remark || null];
+  
     db.query(query, values, (err, result) => {
       if (err) {
         console.error("Error creating sell record:", err);
         return res.status(500).json({ success: false, message: "Error creating sell record." });
       }
-
+  
       const sellId = result.insertId;
-
+  
       // Create AMC record automatically
-      const amcQuery = `
-        INSERT INTO amc_record (sellId, customerId, productId, sellDate, maintenanceStartDate)
-        VALUES (?, ?, ?, ?, DATE_ADD(?, INTERVAL 1 YEAR))
-      `;
-      const amcValues = [sellId, customerId, productId, sellDate, sellDate];
-
-      db.query(amcQuery, amcValues, (err) => {
+      
+      amcAPI.createAMCForNewSell(sellId, (err, amcResult) => {
         if (err) {
-          console.error("Error creating AMC record:", err);
-          return res.status(500).json({ success: false, message: "Error creating AMC record." });
+          console.error("Error creating free AMC for Sell:", err);
+          return res.status(500).json({ success: false, message: "Error creating free AMC." });
         }
-
-        res.status(201).json({ success: true, message: "Sell record and AMC created successfully." });
+  
+        res.status(201).json({ success: true, message: "Sell record and free AMC created successfully." });
       });
+
     });
   },
+  
 
   // Add installment
   addInstallment: (req, res) => {
@@ -115,6 +113,38 @@ const sellAPI = {
       res.status(200).json({ success: true, data: results || [] });
     });
   },
+
+  updateSell: (req, res) => {
+    const { id } = req.params; // Get the sell ID from the route parameter
+    const { customerId, productId, sellDate, price, remark } = req.body;
+  
+    if (!customerId || !productId || !sellDate) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Customer, Product, and Sell Date are required." });
+    }
+  
+    const query = `
+      UPDATE sellmaster
+      SET customerId = ?, productId = ?, sellDate = ?, price = ?, remark = ?
+      WHERE sellId = ?
+    `;
+    const values = [customerId, productId, sellDate, price || null, remark || null, id];
+  
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Error updating sell record:", err);
+        return res.status(500).json({ success: false, message: "Error updating sell record." });
+      }
+  
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Sell record not found." });
+      }
+  
+      res.status(200).json({ success: true, message: "Sell record updated successfully." });
+    });
+  },
+  
 };
 
 module.exports = { sellAPI };
